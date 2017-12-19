@@ -20,7 +20,6 @@ pub fn sum(seq : &str) ->  u32
     let chars : Vec<char> = seq.chars().collect();
     let size = chars.len();
     chars.iter().enumerate().fold(0,|sum,(index,value)| {
-        //println!("({},{},{},sum: {})",index,value, chars[get_next_index(index,size)],sum);
         if *value == chars[get_next_index(index,size)] {sum + value.to_digit(10).unwrap()}
         else {sum}
     })
