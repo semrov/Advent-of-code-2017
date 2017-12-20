@@ -26,7 +26,7 @@ use std::io::Read;
 
 
 
-fn get_row_diff(line : &str) -> i32
+pub fn get_row_diff(line : &str) -> i32
 {
     let mut min = ::std::i32::MAX;
     let mut max = ::std::i32::MIN+1; 
@@ -39,6 +39,24 @@ fn get_row_diff(line : &str) -> i32
     max - min
 }
 
+pub fn get_row_dividable(line : &str) -> i32
+{
+    let v : Vec<i32> = line.split_whitespace()
+        .map(|x| x.parse::<i32>().unwrap())
+        .collect();
+    for i in 0..v.len() 
+    {
+        for j in 0..v.len()
+        {
+            if(v[i] % v[j] == 0 && i != j)
+            {
+                return v[i] / v[j];
+            }
+        }
+    }
+    0
+}
+
 
 fn read_file_as_string(path : &Path) -> Result<String, Error>
 {
@@ -48,18 +66,31 @@ fn read_file_as_string(path : &Path) -> Result<String, Error>
     Ok(content)
 }
 
-pub fn calculate_checksum(spread_sheet : &str) -> i32 
+pub fn calculate_checksum<F>(spread_sheet : &str, cheksum_function : F) -> i32 
+    where F: Fn(&str) -> i32
 {
-    spread_sheet.lines().map(|line| get_row_diff(line)).sum()
+    spread_sheet.lines().map(|line| cheksum_function(line)).sum()
 }
 
-pub fn run()
+pub fn run_part1()
 {
     let path = Path::new("C:/Users/Jure/Documents/rust-projects/advent_of_code_2017/src/resorces_day2/input.txt");
     let checksum = match read_file_as_string(path)
     {
-        Ok(data) => calculate_checksum(&data),
+        Ok(data) => calculate_checksum(&data,get_row_diff),
         Err(_) => panic!("Error reading file {:?}",path.file_name().unwrap()),
     };
-    println!("{}",checksum);
+    println!("Cheksum part 1: {}",checksum);
+}
+
+
+pub fn run_part2()
+{
+    let path = Path::new("C:/Users/Jure/Documents/rust-projects/advent_of_code_2017/src/resorces_day2/input2.txt");
+    let checksum = match read_file_as_string(path)
+    {
+        Ok(data) => calculate_checksum(&data,get_row_dividable),
+        Err(_) => panic!("Error reading file {:?}",path.file_name().unwrap()),
+    };
+    println!("Cheksum part 2: {}",checksum);
 }
