@@ -5,5 +5,5 @@ use advent_of_code_2017::day2;
 
 
 fn main() {
-  day2::run();
+  day1::run();
 }
