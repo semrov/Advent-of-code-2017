@@ -10,6 +10,7 @@ pub mod day5;
 pub mod day6;
 pub mod day7;
 pub mod day8;
+pub mod day9;
 
 #[cfg(test)]
 mod tests_day1 {
