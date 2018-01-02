@@ -1,7 +1,7 @@
 // input 102,255,99,252,200,24,219,57,103,2,226,254,1,0,69,216
 mod test;
 
-struct KnotHash
+pub struct KnotHash
 {
     list : Vec<u8>,
     current_position : usize,
