@@ -78,7 +78,7 @@ impl Network {
 
     fn has_left(&self) -> bool
     {
-        match self.diagram.get(self.curr_pos.0) // .unwrap().get(self.curr_pos.1 -1) == Some(&Line::Minus
+        match self.diagram.get(self.curr_pos.0) 
         {
             Some(col) => {
                 match col.get(self.curr_pos.1 -1) {
