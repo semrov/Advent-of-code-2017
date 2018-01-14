@@ -1,7 +1,7 @@
 extern crate advent_of_code_2017;
 
-use advent_of_code_2017::day20;
+use advent_of_code_2017::day21;
 
 fn main() {
-    day20::run_problem2();
+    day21::run();
 }

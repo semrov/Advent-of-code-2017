@@ -1,10 +1,12 @@
+
+#![feature(iterator_step_by)]
 #[macro_use]
 
-
+/*
 extern crate lazy_static;
 extern crate regex;
-
-
+*/
+extern crate ndarray;
 
 pub mod day1;
 pub mod day2;
@@ -26,8 +28,9 @@ pub mod day16;
 pub mod day17;
 pub mod day18;
 pub mod day19;
-*/
 pub mod day20;
+*/
+pub mod day21;
 
 
 #[cfg(test)]
