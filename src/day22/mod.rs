@@ -54,11 +54,7 @@ impl VirusCarrier {
         {
             for (&is_infected, col) in inf_vector.iter().zip(-(width/2)..((width/2)+1))
             {
-                if is_infected 
-                {
-                    //println!("Infected: {:?}",(row,col));
-                    infection_map.insert((row,col), Status::Infected);
-                }
+                if is_infected { infection_map.insert((row,col), Status::Infected);}
             }
         }
 
