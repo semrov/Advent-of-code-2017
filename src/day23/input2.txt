@@ -1,0 +1,33 @@
+set b 84        //B=84
+set c b         //C=84
+jnz a 2         //JUMP a==1 (a is set to 1 before start)
+jnz 1 5
+mul b 100       //B=8400
+sub b -100000   //B=108400
+set c b         //C=108400 
+sub c -17000    //C=125400
+set f 1         //F=1
+set d 2         //D=2
+set e 2         //E=2
+set g d         //G=2       //G=2       //G=2
+mul g e         //G=4       //G=6       //G=8
+sub g b         //G=-108396 //G=-108394 //G=-108392
+jnz g 2         //JUMP      //JUMP      //JUMP
+set f 0
+sub e -1        //E=3       //E=4
+set g e         //G=3       //G=4
+sub g b         //G=-108397   //G=-108396
+jnz g -8        //JUMP      //JUMP
+
+sub d -1       //D=3
+set g d        //G=3
+sub g b        //G=-....
+jnz g -13
+jnz f 2
+sub h -1
+set g b
+sub g c
+jnz g 2
+jnz 1 3
+sub b -17
+jnz 1 -23
