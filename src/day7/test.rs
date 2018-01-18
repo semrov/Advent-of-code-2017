@@ -42,3 +42,49 @@ pub fn test_find_root_problem1()
 
         assert_eq!(Program::find_root(input),Some(String::from("tknk")));
 }
+
+
+
+
+#[test]
+pub fn test_total_weight()
+{
+        let input = "pbga (66)
+        xhth (57)
+        ebii (61)
+        havc (66)
+        ktlj (57)
+        fwft (72) -> ktlj, cntj, xhth
+        qoyq (66)
+        padx (45) -> pbga, havc, qoyq
+        tknk (41) -> ugml, padx, fwft
+        jptl (61)
+        ugml (68) -> gyxo, ebii, jptl
+        gyxo (61)
+        cntj (57)".trim();
+
+        let mut root = Program::create_tree(input);
+        assert_eq!(root.total_weight(),778 );
+}
+
+
+#[test]
+pub fn test_find_root_problem2()
+{
+        let input = "pbga (66)
+        xhth (57)
+        ebii (61)
+        havc (66)
+        ktlj (57)
+        fwft (72) -> ktlj, cntj, xhth
+        qoyq (66)
+        padx (45) -> pbga, havc, qoyq
+        tknk (41) -> ugml, padx, fwft
+        jptl (61)
+        ugml (68) -> gyxo, ebii, jptl
+        gyxo (61)
+        cntj (57)".trim();
+
+        let mut root = Program::create_tree(input);
+        assert_eq!(60,root.find_balance_weight().unwrap() );
+}
