@@ -1,4 +1,3 @@
-
 mod test;
 use regex::Regex;
 use std::collections::HashMap;
@@ -140,7 +139,6 @@ impl Program {
 
             if max_count < min_count
             {
-                
                 return Some(self.children.get(&names[max.0]).unwrap().as_ref().unwrap().weight - diff);
             }
             else
@@ -148,7 +146,6 @@ impl Program {
                 return Some(self.children.get(&names[min.0]).unwrap().as_ref().unwrap().weight + diff);
             }
         }
-
     None
     }
 
