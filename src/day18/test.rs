@@ -2,7 +2,7 @@ use super::{Computer,Instruction};
 use std::collections::VecDeque;
 
 
-
+/*
 #[test]
 fn test_problem1() {
     let input = "set a 1
@@ -52,6 +52,7 @@ fn test_problem1() {
     comp.execute_instruction();
     assert!(!comp.is_running());
 }
+*/
 
 
 #[test]

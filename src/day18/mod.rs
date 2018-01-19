@@ -2,6 +2,9 @@ mod test;
 
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::thread;
+use std::time::Duration;
+use std::sync::mpsc::{Sender,Receiver,channel};
 
 #[derive(Debug,Copy,Clone)]
 pub enum Operand
@@ -31,7 +34,7 @@ pub enum Instruction
     Mul{reg: char, op: Operand},
     Mod{reg: char, op: Operand},
     Rcv{reg: char},
-    Jgz{reg: char, op: Operand}
+    Jgz{op1: Operand, op2: Operand}
 }
 
 impl Instruction {
@@ -67,9 +70,9 @@ impl Instruction {
             "rcv" => Instruction::Rcv{reg : instruction.next().unwrap().chars().nth(0).unwrap()},
             "jgz" => 
             {
-                let reg = instruction.next().unwrap().chars().nth(0).unwrap();
-                let op = Operand::from_str(instruction.next().unwrap());
-                Instruction::Jgz{reg,op}
+                let op1 = Operand::from_str(instruction.next().unwrap());
+                let op2 = Operand::from_str(instruction.next().unwrap());
+                Instruction::Jgz{op1,op2}
             },
             x => panic!("Invalid instruction {}",x)
         }
@@ -77,22 +80,26 @@ impl Instruction {
 }
 
 
-pub struct Computer<'a>
+pub struct Computer
 {
     pc : isize,
     register : HashMap<char,i64>,
-    program : &'a Vec<Instruction>,
+    program : Vec<Instruction>,
     running : bool,
-    message_queue : VecDeque<i64>,
+    values_send : u32,
+    receiver : Receiver<i64>,
+    sender : Option<Sender<i64>>,
     id : i64
 }
 
-impl<'a> Computer<'a> {
-    pub fn new(program : &'a Vec<Instruction>, id : i64) -> Computer
+impl Computer {
+    pub fn new(program : Vec<Instruction>, id : i64) -> (Computer,Sender<i64>)
     {
+        let (sender,receiver) = channel();
         let mut register = HashMap::new();
         register.insert('p',id);
-        Computer{pc : 0, register, program, running : true, message_queue : VecDeque::new(),id}
+        (Computer{pc : 0, register, program, running : true,
+            values_send : 0, receiver, sender : None,id}, sender)
     }
 
     pub fn parse_program(program : &str) -> Vec<Instruction>
@@ -104,9 +111,14 @@ impl<'a> Computer<'a> {
         self.running
     }
 
-    pub fn add_to_queue(&mut self, val : i64)
+    pub fn set_sender(&mut self, sender : Sender<i64>)
     {
-        self.message_queue.push_back(val);
+        self.sender = Some(sender);
+    }
+
+    fn send_val(&self, value : i64)
+    {
+        self.sender.as_ref().expect(&format!("Computer {} has no sender!",self.id)).send(value).unwrap();
     }
 
     fn increment_pc(&mut self)
@@ -134,7 +146,7 @@ impl<'a> Computer<'a> {
         }
     }
 
-    fn execute_instruction(&mut self ) -> Option<i64>
+    fn execute_instruction(&mut self)
     {
         let instruction = match self.fetch()
         {
@@ -142,83 +154,75 @@ impl<'a> Computer<'a> {
             None => 
             {
                 self.running = false;
-                return None;
+                return;
             },
         };
-
 
         match instruction
         {
             Instruction::Snd{op} => 
             {
-                self.increment_pc();
+                self.values_send += 1;
                 let val = self.get_val_from_operand(&op);
-                return Some(val);
+                self.send_val(val);
             },
             Instruction::Set{reg,op} => 
             {
-                self.increment_pc();
                 let val = self.get_val_from_operand(&op);
                 let mut reg = self.register.entry(reg).or_insert(0); 
                 *reg = val;
-                return None;
             },
             Instruction::Add{reg,op} =>
             {
-                self.increment_pc();
                 let val = self.get_val_from_operand(&op);
                 let mut reg = self.register.entry(reg).or_insert(0); 
                 *reg += val;
-                return None;
             },
             Instruction::Mul{reg,op} =>
             {
-                self.increment_pc();
                 let val = self.get_val_from_operand(&op);
                 let mut reg = self.register.entry(reg).or_insert(0); 
                 *reg *= val;
-                return None;
             },
             Instruction::Mod{reg,op} =>  
             {
-                self.increment_pc();
                 let val = self.get_val_from_operand(&op);
                 let mut reg = self.register.entry(reg).or_insert(0); 
                 *reg %= val;
-                return None;
             },
-            Instruction::Jgz{reg,op} => 
+            Instruction::Jgz{op1,op2} => 
             {
-                match self.register.get(&reg)
+                let condition_val = self.get_val_from_operand(&op1);
+                if condition_val > 0
                 {
-                    Some(&x) => if x > 0
-                    {
-                        let offset = self.get_val_from_operand(&op);
-                        self.pc += offset as isize;
-                        return None;
-                    },
-    	            None => {},
+                    let offset = self.get_val_from_operand(&op2);
+                    self.pc += offset as isize;
+                    return;
                 }
-                self.increment_pc();
-                return None;
             },
             Instruction::Rcv{reg} => 
             {
-                match self.message_queue.pop_front() 
+                match self.receiver.recv_timeout(Duration::from_secs(5))
                 {
-                    Some(val) => 
+                    Ok(val) => 
                     {
                         self.register.insert(reg,val);
-                        self.increment_pc();
                         self.running = true;
                     },
-                    None => 
+                    _ => 
                     {
                         self.running = false;
                     },
-                }
-                return None;
+                }    
             },
+        }
+        self.increment_pc();
+    }
+
+    pub fn run_channels(&mut self)
+    {
+        while self.is_running() {
+            self.execute_instruction();
         }
     }
 
@@ -229,35 +233,18 @@ pub fn run_problem2() {
     let input = include_str!("input.txt");
     let instructions = Computer::parse_program(input);
 
-    let mut comp0 = Computer::new(&instructions,0);
-    let mut comp1 = Computer::new(&instructions,1);
-    let mut count = 0;
-    while comp0.is_running() || comp1.is_running()
-    {
-        let status = (comp0.execute_instruction(),comp1.execute_instruction());
-        match status 
-        {
-            (Some(val), None) => 
-            {
-                //println!("Comp0 sending {}",val);
-                comp1.add_to_queue(val);
-            },
-            (None, Some(val)) => {
-                //println!("Comp1 sending {}",val);
-                comp0.add_to_queue(val);
-                count += 1;
-            },
-            (Some(val0),Some(val1)) => 
-            {
-                //println!("Comp0 sending {}",val0);
-                //println!("Comp1 sending {}",val1);
-                comp0.add_to_queue(val1);
-                comp1.add_to_queue(val0);
-                count += 1;
-            },
-            _ => {} ,
+    let (mut comp0,sender0) = Computer::new(instructions.clone(),0);
+    let (mut comp1,sender1) = Computer::new(instructions.clone(),1);
+    comp0.set_sender(sender1);
+    comp1.set_sender(sender0);
+    let t1 = thread::spawn(move || comp0.run_channels());
+    let t2 = thread::spawn(move || {
+        comp1.run_channels();
+        println!("Send called times: {}", comp1.values_send);
         }
-    }
-    println!("Program 1 send a value {} times.", count);
-    
+    );
+
+    // solution problem2: 6858
+    t1.join().expect("Thread 1 failed");
+    t2.join().expect("Thread 2 failed");    
 }
