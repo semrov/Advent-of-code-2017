@@ -37,6 +37,7 @@ fn test_how_many_cycles_problem1() {
     assert_eq!(memory.how_many_cycles(),5); 
 }
 
+#[test]
 fn test_how_many_cycles_again_problem2()
 {
     let mut memory = Memory::new("0 2 7 0");

@@ -1,5 +1,4 @@
 use super::SpinLock;
-use std::collections::VecDeque;
 
 #[test]
 fn test_insert() {

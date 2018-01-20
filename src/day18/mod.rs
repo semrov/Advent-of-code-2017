@@ -1,7 +1,4 @@
-mod test;
-
 use std::collections::HashMap;
-use std::collections::VecDeque;
 use std::thread;
 use std::time::Duration;
 use std::sync::mpsc::{Sender,Receiver,channel};

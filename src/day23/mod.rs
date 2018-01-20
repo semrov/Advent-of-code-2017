@@ -174,17 +174,13 @@ pub fn run_problem1()
 
 pub fn run_problem2()
 {
-    let input = include_str!("input3.txt");
-    //let mut coprocessor = Coprocessor::new(input);
-    //coprocessor.register[0] = 1;
-    ///coprocessor.run();
+    let input = include_str!("input.txt");
      println!(
-        "P2: {}",
+        "P2: Value of register h: {}",
         (0u64..1001)
             .filter(|bb| !primal::is_prime(108_400 + 17 * bb))
             .count()
     );
-    //println!("Value of register h: {} ",coprocessor.register[('h' as usize) - ('a' as usize)]);
 }
 
 

@@ -10,10 +10,10 @@ pub struct KnotHash
 }
 
 impl KnotHash {
-    pub fn new(max_range : u8) -> KnotHash
+    pub fn new(max_range : u16) -> KnotHash
     {
         KnotHash{
-            list : (0..max_range).collect(), 
+            list : (0..max_range).map(|x| x as u8).collect(), 
             current_position : 0,
             skip_size : 0
         }

@@ -17,10 +17,11 @@ For example, given the following spreadsheet:
 
 In this example, the spreadsheet's checksum would be 8 + 4 + 6 = 18.
 */
+mod test;
 
 use std::path::Path;
 use std::fs::File;
-use std::io::{BufReader,Lines,Error,BufRead};
+use std::io::{Error};
 use std::result::Result;
 use std::io::Read;
 
@@ -48,7 +49,7 @@ pub fn get_row_dividable(line : &str) -> i32
     {
         for j in 0..v.len()
         {
-            if(v[i] % v[j] == 0 && i != j)
+            if v[i] % v[j] == 0 && i != j
             {
                 return v[i] / v[j];
             }
@@ -74,7 +75,7 @@ pub fn calculate_checksum<F>(spread_sheet : &str, cheksum_function : F) -> i32
 
 pub fn run_part1()
 {
-    let path = Path::new("C:/Users/Jure/Documents/rust-projects/advent_of_code_2017/src/resorces_day2/input.txt");
+    let path = Path::new("./src/day2/input.txt");
     let checksum = match read_file_as_string(path)
     {
         Ok(data) => calculate_checksum(&data,get_row_diff),
@@ -86,7 +87,7 @@ pub fn run_part1()
 
 pub fn run_part2()
 {
-    let path = Path::new("C:/Users/Jure/Documents/rust-projects/advent_of_code_2017/src/resorces_day2/input2.txt");
+    let path = Path::new("./src/resorces_day2/input2.txt");
     let checksum = match read_file_as_string(path)
     {
         Ok(data) => calculate_checksum(&data,get_row_dividable),

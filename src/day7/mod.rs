@@ -166,7 +166,7 @@ pub fn run_problem1()
     let f = File::open("./src/day7/input.txt").unwrap();
     let mut br = BufReader::new(f);
     let mut buffer = String::new();
-    br.read_to_string(&mut buffer);
+    br.read_to_string(&mut buffer).unwrap();
     println!("Root is: {}", Program::find_root(&buffer).unwrap());
 }
 

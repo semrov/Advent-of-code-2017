@@ -1,5 +1,3 @@
-
-
 mod test;
 
 use ndarray::{Array2,Axis};
